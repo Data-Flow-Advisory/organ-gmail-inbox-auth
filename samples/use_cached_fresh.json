@@ -1,0 +1,13 @@
+{
+  "state": {
+    "tokens": {
+      "access_token": "ya29.fresh",
+      "refresh_token": "1//refresh-token",
+      "expires_at": "2026-06-11T12:55:00Z",
+      "email": "ops@dataflowadvisory.com"
+    },
+    "now": "2026-06-11T12:00:00Z",
+    "scopes": null,
+    "refresh_skew_seconds": 60
+  }
+}

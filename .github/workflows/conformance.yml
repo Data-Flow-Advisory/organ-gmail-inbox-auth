@@ -1,0 +1,26 @@
+name: conformance
+
+# Run the organ on its committed samples (asserting the canonical
+# {output, rationale, self_metric} shape) and run the pytest suite.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  conform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Conformance check on samples
+        run: python3 conformance_check.py
+
+      - name: Run tests
+        run: |
+          python -m pip install --quiet pytest
+          python -m pytest -v

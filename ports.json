@@ -1,0 +1,46 @@
+{
+  "organ": "organ-gmail-inbox-auth",
+  "summary": "Pure decision organ: Gmail OAuth credential freshness / connection gate. Given a pre-loaded token bundle + clock + requested scopes, decides the single next auth action (not_connected | refresh | use_cached) without touching Google's client libraries, the network, or a DB. Extracted from discovery-engine lib/dataflow_core/gmail_inbox/auth.py.",
+  "ports": {
+    "in": {
+      "state": {
+        "type": "GmailAuthState",
+        "required": true,
+        "shape": {
+          "tokens": {
+            "access_token": "str | null",
+            "refresh_token": "str | null",
+            "expires_at": "str(ISO-8601) | null",
+            "email": "str | null"
+          },
+          "now": "str(ISO-8601) | null",
+          "scopes": "[str] | null",
+          "refresh_skew_seconds": "int | null"
+        }
+      }
+    },
+    "out": {
+      "output": {
+        "type": "GmailAuthDecision",
+        "shape": {
+          "action": "\"not_connected\" | \"refresh\" | \"use_cached\"",
+          "connected": "bool",
+          "needs_refresh": "bool",
+          "email": "str | null",
+          "scopes": "[str]",
+          "refresh_skew_seconds": "int",
+          "seconds_until_expiry": "float | null",
+          "error": "str | null"
+        }
+      }
+    }
+  },
+  "_checked": {
+    "corpus_checked": "2026-06-11",
+    "oss_checked": "2026-06-11",
+    "corpus_verdict": "DUPLICATE",
+    "corpus_ref": "organ-gmail-credentials-credentials",
+    "oss_verdict": "NO_ADOPT",
+    "note": "Corpus: overlaps organ-gmail-credentials-credentials — both decide Gmail OAuth token-refresh routing from {refresh_token present, expires_at <= now + 60s skew} → not_connected/refresh/use. The credentials organ is the superset (adds OAuth client-config completeness). They mirror two source-level near-duplicate modules (gmail_inbox/auth.py vs gmail_credentials/credentials.py). See flagged issue. OSS: NO_ADOPT — the pure 60s-skew freshness decision is trivial bespoke glue mirroring the host's exact rule; the real OAuth refresh I/O already delegates to google-auth in the caller, and the stdlib-only organ-purity contract bars adding the dep here."
+  }
+}
